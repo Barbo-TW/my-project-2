@@ -52,6 +52,18 @@
       "created_at": "2026-11-10T18:35:17.934Z",
       "sender": "macOS",
       "is_cancelled": false
+    },
+    {
+      "id": "b2241852-fbb9-4048-9517-8c7409edd5d4",
+      "role": "user",
+      "content": "我的邦尼記可以排上任何用場？",
+      "status": "pending",
+      "model": "gemini-3.8-flash-medium",
+      "client_type": "gemini-bridge",
+      "parent_message_id": null,
+      "created_at": "2026-11-10T18:41:27.946Z",
+      "sender": "ios",
+      "is_cancelled": false
     }
   ]
 }
