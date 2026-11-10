@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Node.js REST API — Explorer & Docs</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-hover: #263449;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --get: #22c55e;
+      --post: #3b82f6;
+      --put: #f59e0b;
+      --patch: #a855f7;
+      --delete: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem 1.25rem;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .title-group h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+
+    .title-group p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .endpoint-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .endpoint-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      text-align: left;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.65rem 0.85rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .endpoint-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--accent);
+    }
+
+    .method {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.35rem;
+      min-width: 58px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .method.GET { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+    .method.POST { background: rgba(59, 130, 246, 0.18); color: #60a5fa; }
+    .method.PUT { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .method.PATCH { background: rgba(168, 85, 247, 0.18); color: #c084fc; }
+    .method.DELETE { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+
+    .path {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .desc {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .console-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    select, input, textarea {
+      background: #0f172a;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 0.45rem;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.9rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .console-bar input {
+      flex: 1;
+    }
+
+    .btn-send {
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 700;
+      border: none;
+      border-radius: 0.45rem;
+      padding: 0.55rem 1.1rem;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-send:hover {
+      opacity: 0.9;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    .response-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .badge-status {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 0.35rem;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+    }
+
+    pre {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84rem;
+      color: #e2e8f0;
+      max-height: 340px;
+    }
+
+    .items-section {
+      margin-top: 1.5rem;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .item-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      padding: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .item-id {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .tag.completed { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+    .tag.in-progress { background: rgba(59, 130, 246, 0.18); color: #60a5fa; }
+    .tag.pending { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-group">
+        <h1>
+          Node.js REST API
+          <span class="status-pill">v1.0.0 • Online</span>
+        </h1>
+        <p>Express RESTful API with CRUD routes, validation, and interactive playground</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Available Endpoints <span>Click to load</span></h2>
+        <div class="endpoint-list">
+          <button class="endpoint-btn" onclick="preset('GET', '/api/health', '')">
+            <span class="method GET">GET</span>
+            <span class="path">/api/health</span>
+            <span class="desc">Health &amp; uptime</span>
+          </button>
+          <button class="endpoint-btn" onclick="preset('GET', '/api/items', '')">
+            <span class="method GET">GET</span>
+            <span class="path">/api/items</span>
+            <span class="desc">List all items</span>
+          </button>
+          <button class="endpoint-btn" onclick="preset('GET', '/api/items/1', '')">
+            <span class="method GET">GET</span>
+            <span class="path">/api/items/:id</span>
+            <span class="desc">Get item by ID</span>
+          </button>
+          <button class="endpoint-btn" onclick="preset('POST', '/api/items', JSON.stringify({ name: 'Write API tests', description: 'Verify CRUD status codes and payloads', status: 'in-progress' }, null, 2))">
+            <span class="method POST">POST</span>
+            <span class="path">/api/items</span>
+            <span class="desc">Create new item</span>
+          </button>
+          <button class="endpoint-btn" onclick="preset('PATCH', '/api/items/2', JSON.stringify({ status: 'completed' }, null, 2))">
+            <span class="method PATCH">PATCH</span>
+            <span class="path">/api/items/:id</span>
+            <span class="desc">Partial update</span>
+          </button>
+          <button class="endpoint-btn" onclick="preset('PUT', '/api/items/3', JSON.stringify({ name: 'Connect PostgreSQL', description: 'Use connection pool for production persistence', status: 'in-progress' }, null, 2))">
+            <span class="method PUT">PUT</span>
+            <span class="path">/api/items/:id</span>
+            <span class="desc">Replace item</span>
+          </button>
+          <button class="endpoint-btn" onclick="preset('DELETE', '/api/items/3', '')">
+            <span class="method DELETE">DELETE</span>
+            <span class="path">/api/items/:id</span>
+            <span class="desc">Delete item</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Interactive Request Console</h2>
+        <div class="console-bar">
+          <select id="req-method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+          <input id="req-path" type="text" value="/api/items" />
+          <button class="btn-send" onclick="sendRequest()">Send</button>
+        </div>
+
+        <label class="field-label" for="req-body">Request JSON Body (POST / PUT / PATCH)</label>
+        <textarea id="req-body" placeholder='{ "name": "Example task", "status": "pending" }'></textarea>
+
+        <div class="response-meta">
+          <span class="field-label" style="margin:0">JSON Response</span>
+          <span id="res-status" class="badge-status">Ready</span>
+        </div>
+        <pre id="res-output">Click "Send" or choose an endpoint on the left...</pre>
+      </div>
+    </div>
+
+    <div class="card items-section">
+      <h2>Live Store State (`/api/items`)</h2>
+      <div id="items-grid" class="items-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded fallback store when viewed in static preview environment
+    const fallbackStore = {
+      nextId: 4,
+      items: [
+        {
+          id: 1,
+          name: 'Setup Node.js Server',
+          description: 'Configure Express with JSON parsing, CORS, and modular routing.',
+          status: 'completed',
+          createdAt: '2026-11-10T18:00:00.000Z',
+          updatedAt: '2026-11-10T18:00:00.000Z'
+        },
+        {
+          id: 2,
+          name: 'Design REST Endpoints',
+          description: 'Implement GET, POST, PUT, PATCH, and DELETE endpoints for items.',
+          status: 'in-progress',
+          createdAt: '2026-11-10T18:10:00.000Z',
+          updatedAt: '2026-11-10T18:10:00.000Z'
+        },
+        {
+          id: 3,
+          name: 'Connect Database',
+          description: 'Replace the in-memory store with PostgreSQL or MongoDB when ready.',
+          status: 'pending',
+          createdAt: '2026-11-10T18:20:00.000Z',
+          updatedAt: '2026-11-10T18:20:00.000Z'
+        }
+      ]
+    };
+
+    const VALID_STATUSES = ['pending', 'in-progress', 'completed'];
+
+    function simulateApi(method, rawPath, bodyText) {
+      const url = new URL(rawPath, window.location.origin);
+      const pathname = url.pathname;
+      let parsedBody = {};
+      if (bodyText && bodyText.trim()) {
+        try {
+          parsedBody = JSON.parse(bodyText);
+        } catch (e) {
+          return { status: 400, body: { error: 'Bad Request', message: 'Invalid JSON payload in request body', statusCode: 400 } };
+        }
+      }
+
+      if (method === 'GET' && pathname === '/api/health') {
+        return { status: 200, body: { status: 'ok', uptime: 124.5, timestamp: new Date().toISOString() } };
+      }
+
+      if (method === 'GET' && pathname === '/api') {
+        return {
+          status: 200,
+          body: {
+            name: 'Node.js REST API',
+            version: '1.0.0',
+            status: 'running'
+          }
+        };
+      }
+
+      if (pathname === '/api/items') {
+        if (method === 'GET') {
+          let list = [...fallbackStore.items];
+          const status = url.searchParams.get('status');
+          const search = url.searchParams.get('search');
+          if (status) list = list.filter(i => i.status === status.toLowerCase());
+          if (search) {
+            const q = search.toLowerCase();
+            list = list.filter(i => i.name.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
+          }
+          return { status: 200, body: { count: list.length, data: list } };
+        }
+        if (method === 'POST') {
+          const { name, description = '', status = 'pending' } = parsedBody;
+          if (!name || typeof name !== 'string' || !name.trim()) {
+            return { status: 400, body: { error: 'Validation Error', message: 'Field "name" is required and must be a non-empty string', statusCode: 400 } };
+          }
+          if (!VALID_STATUSES.includes(status)) {
+            return { status: 400, body: { error: 'Validation Error', message: `Field "status" must be one of: ${VALID_STATUSES.join(', ')}`, statusCode: 400 } };
+          }
+          const now = new Date().toISOString();
+          const item = { id: fallbackStore.nextId++, name: name.trim(), description: String(description).trim(), status, createdAt: now, updatedAt: now };
+          fallbackStore.items.push(item);
+          return { status: 201, body: { message: 'Item created successfully', data: item } };
+        }
+      }
+
+      const match = pathname.match(/^\/api\/items\/(\d+)$/);
+      if (match) {
+        const id = Number(match[1]);
+        const idx = fallbackStore.items.findIndex(i => i.id === id);
+        if (idx === -1) {
+          return { status: 404, body: { error: 'Not Found', message: `Item with id ${id} not found`, statusCode: 404 } };
+        }
+        if (method === 'GET') {
+          return { status: 200, body: { data: fallbackStore.items[idx] } };
+        }
+        if (method === 'PUT') {
+          const { name, description = '', status = 'pending' } = parsedBody;
+          if (!name || typeof name !== 'string' || !name.trim()) {
+            return { status: 400, body: { error: 'Validation Error', message: 'Field "name" is required', statusCode: 400 } };
+          }
+          fallbackStore.items[idx] = { ...fallbackStore.items[idx], name: name.trim(), description: String(description).trim(), status, updatedAt: new Date().toISOString() };
+          return { status: 200, body: { message: 'Item updated successfully', data: fallbackStore.items[idx] } };
+        }
+        if (method === 'PATCH') {
+          const cur = fallbackStore.items[idx];
+          fallbackStore.items[idx] = {
+            ...cur,
+            name: parsedBody.name !== undefined ? String(parsedBody.name).trim() : cur.name,
+            description: parsedBody.description !== undefined ? String(parsedBody.description).trim() : cur.description,
+            status: parsedBody.status !== undefined ? parsedBody.status : cur.status,
+            updatedAt: new Date().toISOString()
+          };
+          return { status: 200, body: { message: 'Item updated successfully', data: fallbackStore.items[idx] } };
+        }
+        if (method === 'DELETE') {
+          const [deleted] = fallbackStore.items.splice(idx, 1);
+          return { status: 200, body: { message: 'Item deleted successfully', data: deleted } };
+        }
+      }
+
+      return { status: 404, body: { error: 'Not Found', message: `Route ${method} ${pathname} does not exist`, statusCode: 404 } };
+    }
+
+    async function callEndpoint(method, path, bodyText) {
+      try {
+        const opts = { method, headers: { 'Accept': 'application/json' } };
+        if (['POST', 'PUT', 'PATCH'].includes(method) && bodyText.trim()) {
+          opts.headers['Content-Type'] = 'application/json';
+          opts.body = bodyText;
+        }
+        const res = await fetch(path, opts);
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+          throw new Error('Static preview mode');
+        }
+        const data = await res.json();
+        return { status: res.status, body: data };
+      } catch (_) {
+        return simulateApi(method, path, bodyText);
+      }
+    }
+
+    function preset(method, path, body) {
+      document.getElementById('req-method').value = method;
+      document.getElementById('req-path').value = path;
+      document.getElementById('req-body').value = body;
+      sendRequest();
+    }
+
+    async function sendRequest() {
+      const method = document.getElementById('req-method').value;
+      const path = document.getElementById('req-path').value;
+      const bodyText = document.getElementById('req-body').value;
+
+      const result = await callEndpoint(method, path, bodyText);
+      document.getElementById('res-status').textContent = `HTTP ${result.status}`;
+      document.getElementById('res-output').textContent = JSON.stringify(result.body, null, 2);
+      await refreshItemsGrid();
+    }
+
+    async function refreshItemsGrid() {
+      const result = await callEndpoint('GET', '/api/items', '');
+      const container = document.getElementById('items-grid');
+      const items = (result.body && result.body.data) || [];
+      container.innerHTML = items.map(item => `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-id">#${item.id}</span>
+            <span class="tag ${item.status}">${item.status}</span>
+          </div>
+          <strong>${item.name}</strong>
+          <p style="font-size:0.85rem;color:#94a3b8">${item.description}</p>
+        </div>
+      `).join('');
+    }
+
+    sendRequest();
+  </script>
+</body>
+</html>
